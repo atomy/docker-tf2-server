@@ -1,0 +1,19 @@
+#!/bin/bash
+set -e
+
+echo "Starting Docker Container with UID: ${LOCAL_USER_ID}:${LOCAL_GROUP_ID}"
+
+if [ -z "${LOCAL_USER_ID}" -o -z "${LOCAL_GROUP_ID}" ] ; then
+  echo "ERROR: Either LOCAL_USER_ID or LOCAL_GROUP_ID is empty!"
+  exit 1
+fi
+
+groupadd -g ${LOCAL_GROUP_ID} docker || true
+useradd -s /bin/bash -u ${LOCAL_USER_ID} -g ${LOCAL_GROUP_ID} docker || true
+
+if [ ${LOCAL_USER_ID} -ne ${DOCKER_BUILT_UID} -o ${LOCAL_GROUP_ID} -ne ${DOCKER_BUILT_GID} ] ; then
+  echo "UID/GID is not ${DOCKER_BUILT_UID} which we built the container with, chowning..."
+  chown -R ${LOCAL_USER_ID}:${LOCAL_GROUP_ID} ${DOCKER_SERVER_ROOT}
+fi
+
+sudo -E -u docker -- "$@"

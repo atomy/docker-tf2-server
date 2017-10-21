@@ -1,3 +1,4 @@
 #!/bin/sh
-cd $HOME/hlserver
+
+cd /srv/tf2
 ./steamcmd.sh +runscript tf2_ds.txt
